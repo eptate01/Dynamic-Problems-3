@@ -1,0 +1,18 @@
+Problem 1, Bellman Ford, has a time complexity of O(N^2). The first for loop (line 12) is a process called relaxing, 
+which loops for every path to another node we have. This allows us to make sure we get from every node to 
+the farthest node possible. The next loop (line 13) goes through every Vertice we have to assign a path to that vertex.
+The next loop (line 15) may appear to increase our time complexity, but since it only goes through the same verticies
+again, it increases it my a constant (not relevant for our time complexities). The next two loops do not increase our
+time complexity since they are also O(N^2). These loops find the negative cycle in the graph if there is one.
+
+Problem 2, Floyd Warshall Algorithm , is O(N^3). In this algorithm we loop through the amount of vertices 
+for every vertex for every vertex. This results in three loops creating a time complexity of O(N^3). 
+Before that we loop through every weight and assign that weight value to the dp list, which is O(N^2) 
+and list every vertex distance from itself as 0, which is O(N). The O(N+N^2+N^3) can be simplified to O(N^3).
+
+Prolem 3 is time complexity O(N^2). In this algorithm we start with a loop that assigns the top row of the dp list in O(N) and the the 
+first column in O(N). After that we loop through the 2-D list to find the minimum cost path. This results in a time complexity of O(N^2).
+
+Problem 4 is time complexity O(N^2). In this code we end up using a recursive function because of memoization. However, during the recursive loops
+we store the answers we get so we do not end up re-using them. This allows us to keep the two for loops at O(N^2), since we check if each node was 
+visited in the recursive part of a past function.

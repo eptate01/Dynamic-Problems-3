@@ -37,27 +37,34 @@ def BellmanFord(graph, start, weights):
     return dist[numEdges]
 
 def FloydWarshall(graph, weights):
+    negVertices = set()
     length = len(graph)
     negatives = False
     dist = [[math.inf for _ in range(len(graph))] for _ in range(len(graph))]
+
+    for i in range(length):
+        for j in range(length):
+            if weights[i][j] != 0:
+                dist[i][j] = weights[i][j]
+
     for i in range(len(dist)):
         dist[i][i] = 0
+
     for i in range(length):
         for s in range(length):
             for t in range(length):
-                if weights[i][t] != 0:
-                    dist[s][t] = min(dist[s][t],dist[s][i] + weights[i][t])
+                if graph[i][t] != 0:
+                    dist[s][t] = min(dist[s][t],dist[s][i] + dist[i][t])
+                    if s == t and dist[s][t] < 0:
+                        negVertices.add(s)
+                        negVertices.add(i)
     for i in range(length):
         if dist[i][i] < 0:
             negatives = True
     if negatives == True:
-        print()
-    else: 
-        for i in range(length):
-            for s in range(length):
-                for t in range(length):
-                    if weights[i][t] != 0:
-                        dist[s][t] = min(dist[s][t],dist[s][i] + weights[i][t])
+        print("Negative Cycle Found")
+        return [negVertices]
+    
     
     return dist
 
@@ -81,36 +88,43 @@ def Problem3(matrix):
 def Problem4(matrix):
     length = len(matrix)
     MaxSequenceIndex = []
-    dp = [[-1 for i in range(length)] for i in range(length)]
+    dp = [[[] for i in range(length)] for i in range(length)]
 
     for i in range(length):
         for j in range(length):
-            if dp[i][j] == -1:
+            if dp[i][j] == []:
                 possMax = []
-                dp[i][j] = Problem4_depthSearch(i,j,matrix,length, possMax)
+                Problem4_depthSearch(i,j,matrix,length, possMax, dp)
                 if len(possMax) > len(MaxSequenceIndex):
                     MaxSequenceIndex = deepcopy(possMax)
     
     MaxSequence = []
     for i in MaxSequenceIndex:
         MaxSequence.append(matrix[i[0]][i[1]])
-
     return MaxSequence
 
-def Problem4_depthSearch(i,j,matrix,length, possMax):
+def Problem4_dpCheck(i,j,matrix,length,possMax,dp):
+    if not dp[i][j]:
+            Problem4_depthSearch(i, j, matrix, length, possMax, dp)   
+    else:
+        for w in dp[i][j]:
+            possMax.append(w)
+
+def Problem4_depthSearch(i,j,matrix,length, possMax, dp):
     possMax.append([i,j])
     if i < 0 or j < 0:
         return
     if i >= length or j >= length:
         return
     if i < length-1 and matrix[i+1][j] == matrix[i][j]+1:
-        Problem4_depthSearch(i+1, j, matrix, length, possMax)
+        Problem4_dpCheck(i+1, j, matrix, length, possMax, dp)
     elif j < length-1 and matrix[i][j+1] == matrix[i][j] + 1:
-        Problem4_depthSearch(i,j+1,matrix,length, possMax)
+        Problem4_dpCheck(i, j+1, matrix, length, possMax, dp)
     elif i > 0 and matrix[i-1][j] == matrix[i][j]+ 1:
-        Problem4_depthSearch(i-1,j,matrix,length, possMax)
+        Problem4_dpCheck(i-1, j, matrix, length, possMax, dp)
     elif j > 0 and matrix[i][j-1] == matrix[i][j] + 1:
-        Problem4_depthSearch(i,j-1,matrix,length, possMax)
+        Problem4_dpCheck(i, j-1, matrix, length, possMax, dp)
+    dp[i][j] = possMax
     return 
 
         
@@ -146,6 +160,7 @@ if __name__ == '__main__':
     print("Floyd Warshall no negative cycle: ")
     [print(i) for i in FloydWarshall(graph,weight)]
     print()
+    
     print("Floyd Warshall with negative cycle: ")
     [print(i) for i in FloydWarshall(graph,negWeight)]
 
